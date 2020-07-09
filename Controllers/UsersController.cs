@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using SavioAPI.Models;
+using SavioAPI.Data;
+using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace SavioAPI.Controllers
 {
@@ -78,8 +81,9 @@ namespace SavioAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("Create")]
-        public async Task<ActionResult<User>> PostUser([FromBody]User user)
+        public async Task<ActionResult<User>> PostUser([FromBody]JObject temp)
         {
+            User user = JsonConvert.DeserializeObject<User>(temp.ToString());
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 

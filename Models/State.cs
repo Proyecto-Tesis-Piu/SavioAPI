@@ -6,7 +6,7 @@ namespace SavioAPI.Models
     {
         public string Name { get; set; }
         [Key]
-        public string Code { get; set; }
+        public string StateCode { get; set; }
         public string CountryCode { get; set; }
     }
 }
