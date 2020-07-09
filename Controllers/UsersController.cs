@@ -81,9 +81,19 @@ namespace SavioAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost("Create")]
-        public async Task<ActionResult<User>> PostUser([FromBody]JObject temp)
+        public async Task<ActionResult<User>> PostUser([FromBody]User user)
         {
-            User user = JsonConvert.DeserializeObject<User>(temp.ToString());
+            user.CountryCode = user.Country.CountryCode;
+            user.StateCode = user.State.StateCode;
+            switch (user.CivilStateString)
+            {
+                case "Single":
+                    user.CivilStatebyte = Convert.ToByte(CivilState.Single);
+                    break;
+                default:
+                    user.CivilStatebyte = Convert.ToByte(CivilState.Married);
+                    break;
+            }
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 

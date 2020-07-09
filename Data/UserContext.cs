@@ -12,7 +12,7 @@ namespace SavioAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().ToTable("User");
+            modelBuilder.Entity<User>().ToTable("User").HasKey(u => u.Id);
         }
     }
 }
