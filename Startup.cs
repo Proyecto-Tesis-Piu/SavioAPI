@@ -30,6 +30,7 @@ namespace SavioAPI
 
             services.AddDbContext<UserContext>(opt => opt.UseSqlServer(@"Server=localhost; Database=Savio; Integrated Security=True"));
             services.AddDbContext<CountriesContext>(opt => opt.UseSqlServer(@"Server=localhost; Database=Savio; Integrated Security=True"));
+            services.AddDbContext<TransactionContext>(opt => opt.UseSqlServer(@"Server=localhost; Database=Savio; Integrated Security=True"));
             services.AddMvc();
             services.AddControllers();
 
@@ -39,6 +40,8 @@ namespace SavioAPI
                     builder =>
                     {
                         builder.WithOrigins("http://localhost:4200");
+                        builder.WithHeaders("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+                        builder.WithHeaders(Microsoft.Net.Http.Headers.HeaderNames.ContentType, "application/json");
                     });
             });
         }

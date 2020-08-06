@@ -10,6 +10,7 @@ using SavioAPI.Models;
 using SavioAPI.Data;
 using Newtonsoft.Json;
 using System.Text.Json;
+using System.Net;
 
 namespace SavioAPI.Controllers
 {
@@ -31,32 +32,51 @@ namespace SavioAPI.Controllers
         //    return await _context.Users.ToListAsync();
         //}
 
-        // GET: api/User/Get/e91e94b8-d50f-4015-862a-1806c9fbe20c
-        [HttpGet("Get/{id}")]
-        public async Task<ActionResult<User>> GetUser(Guid id)
+        // GET: api/User/Login
+        [HttpPost("Login")]
+        public async Task<ActionResult<User>> GetUser([FromBody]User user)
         {
-            var user = await _context.Users.FindAsync(id);
+            var result = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
 
-            if (user == null)
+            if (result == null)
             {
                 return NotFound();
             }
 
-            return user;
+            if (user.Password != result.Password)
+            {
+                var msg = new System.Net.Http.HttpResponseMessage(HttpStatusCode.Unauthorized) { ReasonPhrase = "Incorrect Password" };
+                throw new System.Web.Http.HttpResponseException(msg);
+            }
+            return result;
         }
 
-        // PUT: api/User/5
+        // PUT: api/User/e91e94b8-d50f-4015-862a-1806c9fbe20c
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(Guid id, User user)
+        public async Task<ActionResult<User>> PutUser(Guid id, UserDto user)
         {
             if (id != user.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(user).State = EntityState.Modified;
+            User usertemp = await _context.Users.FindAsync(id);
+            //_context.Entry(usertemp).State = EntityState.Modified;
+            if (usertemp.Password == user.Password)
+            {
+                if(user.NewPassword != null && user.Password != user.NewPassword)
+                {
+                    user.Password = user.NewPassword;
+                }
+                _context.Users.Update(user);
+            }
+            else {
+                var msg = new System.Net.Http.HttpResponseMessage(HttpStatusCode.Unauthorized) { ReasonPhrase = "Incorrect Password" };
+                throw new System.Web.Http.HttpResponseException(msg);
+            }
+            
 
             try
             {
@@ -74,14 +94,14 @@ namespace SavioAPI.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(user);
         }
 
-        // POST: api/User/Create
+        // POST: api/User
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost("Create")]
-        public async Task<ActionResult<User>> PostUser([FromBody]User user)
+        [HttpPost]
+        public async Task<ActionResult<User>> PostUser([FromBody] User user)
         {
             user.CountryCode = user.Country.CountryCode;
             user.StateCode = user.State.StateCode;
