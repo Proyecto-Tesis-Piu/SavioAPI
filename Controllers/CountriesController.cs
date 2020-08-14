@@ -43,10 +43,10 @@ namespace SavioAPI.Controllers
         }
 
         // GET: api/Country/MEX/States
-        [HttpGet("{id}/States")]
-        public async Task<ActionResult<IEnumerable<State>>> GetStates()
+        [HttpGet("{countryCode}/States")]
+        public async Task<ActionResult<IEnumerable<State>>> GetStates(string countryCode)
         {
-            return await _context.States.ToListAsync();
+            return await _context.States.Where(state => state.CountryCode == countryCode).ToListAsync();
         }
 
         // GET: api/Country/State/5

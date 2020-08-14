@@ -14,7 +14,8 @@
       "launchUrl": "api/Country",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "nativeDebugging": false
     },
     "SavioAPI": {
       "commandName": "Project",

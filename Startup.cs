@@ -6,6 +6,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using SavioAPI.Data;
+using SavioAPI.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Xml.Linq;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Diagnostics.Tracing;
+using System.Diagnostics;
 
 namespace SavioAPI
 {
@@ -28,9 +37,24 @@ namespace SavioAPI
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<UserContext>(opt => opt.UseSqlServer(@"Server=localhost; Database=Savio; Integrated Security=True"));
-            services.AddDbContext<CountriesContext>(opt => opt.UseSqlServer(@"Server=localhost; Database=Savio; Integrated Security=True"));
-            services.AddDbContext<TransactionContext>(opt => opt.UseSqlServer(@"Server=localhost; Database=Savio; Integrated Security=True"));
+            services.Configure<IdentityOptions>(opt => {
+                opt.Password.RequiredLength = 8;
+                opt.Password.RequireDigit = true;
+                opt.Password.RequiredUniqueChars = 0;
+                opt.Password.RequireNonAlphanumeric = false;
+                opt.Password.RequireUppercase = false;
+                opt.Password.RequireLowercase = false;
+                opt.User.RequireUniqueEmail = true;
+            });
+
+            services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
+
+            services.AddDbContext<UserContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("SavioDatabase")));
+            services.AddDbContext<CountriesContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("SavioDatabase")));
+            services.AddDbContext<TransactionContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("SavioDatabase")));
+
+            services.AddDefaultIdentity<ApplicationUser>().AddEntityFrameworkStores<UserContext>();
+
             services.AddMvc();
             services.AddControllers();
 
@@ -39,10 +63,31 @@ namespace SavioAPI
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:4200");
+                        builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString());
                         builder.WithHeaders("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-                        builder.WithHeaders(Microsoft.Net.Http.Headers.HeaderNames.ContentType, "application/json");
+                        builder.AllowAnyHeader();
                     });
+            });
+
+            var secret = Encoding.UTF8.GetBytes(Configuration["ApplicationSettings:JWT_Secret"].ToString());
+
+            services.AddAuthentication(x => 
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = false;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(secret),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                };
             });
         }
 
@@ -58,6 +103,7 @@ namespace SavioAPI
 
             app.UseCors(MyAllowSpecificOrigins);
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

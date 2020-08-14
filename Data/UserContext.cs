@@ -8,11 +8,11 @@ namespace SavioAPI.Data
         public UserContext(DbContextOptions<UserContext> options) :base(options)
         { }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<ApplicationUser> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>().ToTable("User").HasKey(u => u.Id);
+            modelBuilder.Entity<ApplicationUser>().ToTable("User").HasKey(u => u.Id);
         }
     }
 }

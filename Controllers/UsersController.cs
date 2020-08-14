@@ -11,6 +11,12 @@ using SavioAPI.Data;
 using Newtonsoft.Json;
 using System.Text.Json;
 using System.Net;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Options;
 
 namespace SavioAPI.Controllers
 {
@@ -18,111 +24,145 @@ namespace SavioAPI.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly UserContext _context;
+        //private readonly UserContext _context;
 
-        public UsersController(UserContext context)
+        private UserManager<ApplicationUser> _userManager;
+        private SignInManager<ApplicationUser> _signInManager;
+        private readonly ApplicationSettings _appSettings;
+
+        public UsersController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, //UserContext context, 
+            IOptions<ApplicationSettings> appSettings)
         {
-            _context = context;
+            //_context = context;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _appSettings = appSettings.Value;
         }
 
-        //// GET: api/User
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-        //{
-        //    return await _context.Users.ToListAsync();
-        //}
-
-        // GET: api/User/Login
+        // POST: api/User/Login
         [HttpPost("Login")]
-        public async Task<ActionResult<User>> GetUser([FromBody]User user)
+        public async Task<ActionResult<ApplicationUser>> Login([FromBody]ApplicationUser user)
         {
-            var result = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+            var result = await _userManager.FindByNameAsync(user.Email);
 
             if (result == null)
             {
-                return NotFound();
+                return BadRequest(new { ReasonPhrase = "Email incorrecto" });
             }
+            else {
+                if (await _userManager.CheckPasswordAsync(result, user.Password)) {
+                    var tokenDescriptor = new SecurityTokenDescriptor
+                    {
+                        Subject = new ClaimsIdentity(new Claim[] {
+                            new Claim("id", result.Id.ToString())
+                        }),
+                        Expires = DateTime.UtcNow.AddDays(1),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256)
+                    };
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+                    var token = tokenHandler.WriteToken(securityToken);
+                    return Ok(new { token });
+                }
+            }
+            return BadRequest(new { ReasonPhrase = "Password incorrecto" });
 
-            if (user.Password != result.Password)
-            {
-                var msg = new System.Net.Http.HttpResponseMessage(HttpStatusCode.Unauthorized) { ReasonPhrase = "Incorrect Password" };
-                throw new System.Web.Http.HttpResponseException(msg);
-            }
-            return result;
         }
 
         // PUT: api/User/e91e94b8-d50f-4015-862a-1806c9fbe20c
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<ActionResult<User>> PutUser(Guid id, UserDto user)
-        {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<ActionResult<ApplicationUser>> PutUser(String id, UserDto user)
+        //{
+        //    if (id != user.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            User usertemp = await _context.Users.FindAsync(id);
-            //_context.Entry(usertemp).State = EntityState.Modified;
-            if (usertemp.Password == user.Password)
-            {
-                if(user.NewPassword != null && user.Password != user.NewPassword)
-                {
-                    user.Password = user.NewPassword;
-                }
-                _context.Users.Update(user);
-            }
-            else {
-                var msg = new System.Net.Http.HttpResponseMessage(HttpStatusCode.Unauthorized) { ReasonPhrase = "Incorrect Password" };
-                throw new System.Web.Http.HttpResponseException(msg);
-            }
+        //    ApplicationUser usertemp = await _context.Users.FindAsync(id);
+        //    //_context.Entry(usertemp).State = EntityState.Modified;
+        //    if (usertemp.PasswordHash == user.PasswordHash)
+        //    {
+        //        if(user.NewPassword != null && user.PasswordHash != user.PasswordHash)
+        //        {
+        //            user.PasswordHash = user.NewPassword;
+        //        }
+        //        _context.Users.Update(user);
+        //    }
+        //    else {
+        //        var msg = new System.Net.Http.HttpResponseMessage(HttpStatusCode.Unauthorized) { ReasonPhrase = "Incorrect Password" };
+        //        throw new System.Web.Http.HttpResponseException(msg);
+        //    }
             
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!UserExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return Ok(user);
-        }
+        //    return Ok(user);
+        //}
 
-        // POST: api/User
+        // POST: api/User/Register
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<User>> PostUser([FromBody] User user)
+        [HttpPost("Register")]
+        public async Task<ActionResult<ApplicationUser>> Register([FromBody] ApplicationUser user)
         {
-            user.CountryCode = user.Country.CountryCode;
-            user.StateCode = user.State.StateCode;
             switch (user.CivilStateString)
             {
                 case "Single":
                     user.CivilStatebyte = Convert.ToByte(CivilState.Single);
                     break;
-                default:
+                case "Married":
                     user.CivilStatebyte = Convert.ToByte(CivilState.Married);
                     break;
+                case "Divorced":
+                    user.CivilStatebyte = Convert.ToByte(CivilState.Divorced);
+                    break;
+                case "Widowed":
+                    user.CivilStatebyte = Convert.ToByte(CivilState.Widowed);
+                    break;
+                default:
+                    user.CivilStatebyte = Convert.ToByte(CivilState.FreeUnion);
+                    break;
             }
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            user.SexBit = user.Sex == "Male";
+            user.SexBit = Convert.ToBoolean(user.Sex);
+            user.UserName = user.Email;
+            try
+            {
+                var result = await _userManager.CreateAsync(user, user.Password);
+                return Ok(result);
+            }
+            catch (Exception ex) {
+                throw ex;
+            }
+
+
+            //_context.Users.Add(user);
+            //await _context.SaveChangesAsync();
+
+            //return CreatedAtAction("GetUser", new { id = user.Id }, user);
+
         }
 
-        private bool UserExists(Guid id)
-        {
-            return _context.Users.Any(e => e.Id == id);
-        }
+        //private bool UserExists(String id)
+        //{
+        //    return _context.Users.Any(e => e.Id == id);
+        //}
     }
 }
