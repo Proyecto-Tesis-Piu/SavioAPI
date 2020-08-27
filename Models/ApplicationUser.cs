@@ -46,8 +46,8 @@ namespace SavioAPI.Models
         [NotMapped]
         [ForeignKey("StateCode")]
         public State State { get; set; }
-        [Column("Age", TypeName = "tinyint")]
-        public Byte Age { get; set; }
+        //[Column("Age", TypeName = "tinyint")]
+        //public Byte Age { get; set; }
         [Column("Sex", TypeName = "bit")]
         public bool SexBit { get; set; }
         [NotMapped]
@@ -71,6 +71,9 @@ namespace SavioAPI.Models
 
         [NotMapped]
         public String Password { get; set; }
+
+        [Column("BirthDate", TypeName = "date")]
+        public DateTime BirthDate { get; set; }
     }
 
     internal enum CivilState
