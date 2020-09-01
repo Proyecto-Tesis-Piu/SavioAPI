@@ -62,8 +62,8 @@ namespace SavioAPI.Models
         [Column("CountryCode", TypeName = "char(3)")]
         public string CountryCode { get; set; }
 
-        [StringLength(3)]
-        [Column("StateCode", TypeName = "char(3)")]
+        [StringLength(5)]
+        [Column("StateCode", TypeName = "char(5)")]
         public string StateCode { get; set; }
 
         [Column("CivilState", TypeName = "tinyint")]
@@ -72,6 +72,7 @@ namespace SavioAPI.Models
         [NotMapped]
         public String Password { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:O}", ApplyFormatInEditMode = true)]
         [Column("BirthDate", TypeName = "date")]
         public DateTime BirthDate { get; set; }
     }

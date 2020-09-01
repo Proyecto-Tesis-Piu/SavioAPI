@@ -121,27 +121,15 @@ namespace SavioAPI.Controllers
         [HttpPost("Register")]
         public async Task<ActionResult<ApplicationUser>> Register([FromBody] ApplicationUser user)
         {
-            switch (user.CivilStateString)
+            user.CivilStatebyte = user.CivilStateString switch
             {
-                case "Single":
-                    user.CivilStatebyte = Convert.ToByte(CivilState.Single);
-                    break;
-                case "Married":
-                    user.CivilStatebyte = Convert.ToByte(CivilState.Married);
-                    break;
-                case "Divorced":
-                    user.CivilStatebyte = Convert.ToByte(CivilState.Divorced);
-                    break;
-                case "Widowed":
-                    user.CivilStatebyte = Convert.ToByte(CivilState.Widowed);
-                    break;
-                default:
-                    user.CivilStatebyte = Convert.ToByte(CivilState.FreeUnion);
-                    break;
-            }
-
+                "Single" => Convert.ToByte(CivilState.Single),
+                "Married" => Convert.ToByte(CivilState.Married),
+                "Divorced" => Convert.ToByte(CivilState.Divorced),
+                "Widowed" => Convert.ToByte(CivilState.Widowed),
+                _ => Convert.ToByte(CivilState.FreeUnion),
+            };
             user.SexBit = user.Sex == "Male";
-            user.SexBit = Convert.ToBoolean(user.Sex);
             user.UserName = user.Email;
             try
             {

@@ -275,6 +275,7 @@ namespace SavioAPI.Data
 
             var States = new State[]
             {
+                #region Mexico
                 new State { Name = "Aguascalientes", StateCode = "AGU", CountryCode = "MEX" },
                 new State { Name = "Baja California", StateCode = "BCN", CountryCode = "MEX" },
                 new State { Name = "Baja California Sur", StateCode = "BCS", CountryCode = "MEX" },
@@ -307,6 +308,8 @@ namespace SavioAPI.Data
                 new State { Name = "Veracruz", StateCode = "VER", CountryCode = "MEX" },
                 new State { Name = "Yucatán", StateCode = "YUC", CountryCode = "MEX" },
                 new State { Name = "Zacatecas", StateCode = "ZAC", CountryCode = "MEX" },
+                #endregion
+                #region USA
                 new State { Name = "Alabama", StateCode = "AL", CountryCode = "USA" },
                 new State { Name = "Alaska", StateCode = "AK", CountryCode = "USA" },
                 new State { Name = "Arizona", StateCode = "AZ", CountryCode = "USA" },
@@ -358,39 +361,29 @@ namespace SavioAPI.Data
                 new State { Name = "West Virginia", StateCode = "WV", CountryCode = "USA" },
                 new State { Name = "Wisconsin", StateCode = "WI", CountryCode = "USA" },
                 new State { Name = "Wyoming", StateCode = "WY", CountryCode = "USA" },
+                #endregion
+                #region Afghanistan
                 new State { Name = "Balkh", StateCode = "BAL", CountryCode = "AFG" },
                 new State { Name = "Bamyan", StateCode = "BAM", CountryCode = "AFG" },
                 new State { Name = "Badghis", StateCode = "BDG", CountryCode = "AFG" },
                 new State { Name = "Badakhshan", StateCode = "BDS", CountryCode = "AFG" },
                 new State { Name = "Baghlan", StateCode = "BGL", CountryCode = "AFG" },
-                new State { Name = "Brändö", StateCode = "BR", CountryCode = "AL" },
                 new State { Name = "Daykundi", StateCode = "DAY", CountryCode = "AFG" },
-                new State { Name = "Eckerö", StateCode = "EC", CountryCode = "AL" },
-                new State { Name = "Föglö", StateCode = "FG", CountryCode = "AL" },
-                new State { Name = "Finström", StateCode = "FN", CountryCode = "AL" },
                 new State { Name = "Farah", StateCode = "FRA", CountryCode = "AFG" },
                 new State { Name = "Faryab", StateCode = "FYB", CountryCode = "AFG" },
                 new State { Name = "Ghazni", StateCode = "GHA", CountryCode = "AFG" },
                 new State { Name = "Ghor", StateCode = "GHO", CountryCode = "AFG" },
-                new State { Name = "Geta", StateCode = "GT", CountryCode = "AL" },
                 new State { Name = "Helmand", StateCode = "HEL", CountryCode = "AFG" },
                 new State { Name = "Herat", StateCode = "HER", CountryCode = "AFG" },
-                new State { Name = "Hammarland", StateCode = "HM", CountryCode = "AL" },
-                new State { Name = "Jomala", StateCode = "JM", CountryCode = "AL" },
                 new State { Name = "Jowzjan", StateCode = "JOW", CountryCode = "AFG" },
                 new State { Name = "Kabul", StateCode = "KAB", CountryCode = "AFG" },
                 new State { Name = "Kandahar", StateCode = "KAN", CountryCode = "AFG" },
                 new State { Name = "Kapisa", StateCode = "KAP", CountryCode = "AFG" },
                 new State { Name = "Kunduz", StateCode = "KDZ", CountryCode = "AFG" },
                 new State { Name = "Khost", StateCode = "KHO", CountryCode = "AFG" },
-                new State { Name = "Kökar", StateCode = "KK", CountryCode = "AL" },
-                new State { Name = "Kumlinge", StateCode = "KM", CountryCode = "AL" },
                 new State { Name = "Kunar", StateCode = "KNR", CountryCode = "AFG" },
                 new State { Name = "Laghman", StateCode = "LAG", CountryCode = "AFG" },
-                new State { Name = "Lemland", StateCode = "LE", CountryCode = "AL" },
                 new State { Name = "Logar", StateCode = "LOG", CountryCode = "AFG" },
-                new State { Name = "Lumparland", StateCode = "LU", CountryCode = "AL" },
-                new State { Name = "Mariehamn", StateCode = "MH", CountryCode = "AL" },
                 new State { Name = "Nangarhar", StateCode = "NAN", CountryCode = "AFG" },
                 new State { Name = "Nimruz", StateCode = "NIM", CountryCode = "AFG" },
                 new State { Name = "Nuristan", StateCode = "NUR", CountryCode = "AFG" },
@@ -400,14 +393,44 @@ namespace SavioAPI.Data
                 new State { Name = "Paktika", StateCode = "PKA", CountryCode = "AFG" },
                 new State { Name = "Samangan", StateCode = "SAM", CountryCode = "AFG" },
                 new State { Name = "Sar-e Pol", StateCode = "SAR", CountryCode = "AFG" },
-                new State { Name = "Sund", StateCode = "SD", CountryCode = "AL" },
-                new State { Name = "Sottunga", StateCode = "ST", CountryCode = "AL" },
-                new State { Name = "Saltvik", StateCode = "SV", CountryCode = "AL" },
                 new State { Name = "Takhar", StateCode = "TAK", CountryCode = "AFG" },
                 new State { Name = "Urozgan", StateCode = "URU", CountryCode = "AFG" },
-                new State { Name = "Vårdö", StateCode = "VR", CountryCode = "AL" },
                 new State { Name = "Maidan Wardak", StateCode = "WAR", CountryCode = "AFG" },
                 new State { Name = "Zabul", StateCode = "ZAB", CountryCode = "AFG" },
+                #endregion
+                #region Albania
+                new State { Name = "Berat", StateCode = "AL-01", CountryCode = "ALB" },
+                new State { Name = "Durrës", StateCode = "AL-02", CountryCode = "ALB" },
+                new State { Name = "Elbasan", StateCode = "AL-03", CountryCode = "ALB" },
+                new State { Name = "Fier", StateCode = "AL-04", CountryCode = "ALB" },
+                new State { Name = "Gjirokastër", StateCode = "AL-05", CountryCode = "ALB" },
+                new State { Name = "Korçë", StateCode = "AL-06", CountryCode = "ALB" },
+                new State { Name = "Kukës", StateCode = "AL-07", CountryCode = "ALB" },
+                new State { Name = "Lezhë", StateCode = "AL-08", CountryCode = "ALB" },
+                new State { Name = "Dibër", StateCode = "AL-09", CountryCode = "ALB" },
+                new State { Name = "Shkodër", StateCode = "AL-10", CountryCode = "ALB" },
+                new State { Name = "Tiranë", StateCode = "AL-11", CountryCode = "ALB" },
+                new State { Name = "Vlorë", StateCode = "AL-12", CountryCode = "ALB" },
+                #endregion
+                #region Aland Islands
+                new State { Name = "Brändö", StateCode = "BR", CountryCode = "ALA" },
+                new State { Name = "Eckerö", StateCode = "EC", CountryCode = "ALA" },
+                new State { Name = "Föglö", StateCode = "FG", CountryCode = "ALA" },
+                new State { Name = "Finström", StateCode = "FN", CountryCode = "ALA" },
+                new State { Name = "Geta", StateCode = "GT", CountryCode = "ALA" },
+                new State { Name = "Hammarland", StateCode = "HM", CountryCode = "ALA" },
+                new State { Name = "Jomala", StateCode = "JM", CountryCode = "ALA" },
+                new State { Name = "Kökar", StateCode = "KK", CountryCode = "ALA" },
+                new State { Name = "Kumlinge", StateCode = "KM", CountryCode = "ALA" },
+                new State { Name = "Lemland", StateCode = "LE", CountryCode = "ALA" },
+                new State { Name = "Lumparland", StateCode = "LU", CountryCode = "ALA" },
+                new State { Name = "Mariehamn", StateCode = "MH", CountryCode = "ALA" },
+                new State { Name = "Sund", StateCode = "SD", CountryCode = "ALA" },
+                new State { Name = "Sottunga", StateCode = "ST", CountryCode = "ALA" },
+                new State { Name = "Saltvik", StateCode = "SV", CountryCode = "ALA" },
+                new State { Name = "Vårdö", StateCode = "VR", CountryCode = "ALA" },
+                #endregion
+
             };
             foreach (State s in States)
             {

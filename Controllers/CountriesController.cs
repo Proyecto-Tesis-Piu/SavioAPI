@@ -50,22 +50,22 @@ namespace SavioAPI.Controllers
         }
 
         // GET: api/Country/State/5
-        [HttpGet("State/{id}")]
-        public async Task<ActionResult<State>> GetState(string id)
-        {
-            var state = await _context.States.FindAsync(id);
+        //[HttpGet("State/{id}")]
+        //public async Task<ActionResult<State>> GetState(string id)
+        //{
+        //    var state = await _context.States.FindAsync(id);
 
-            if (state == null)
-            {
-                return NotFound();
-            }
+        //    if (state == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return state;
-        }
+        //    return state;
+        //}
 
-        private bool CountryExists(string id)
-        {
-            return _context.Countries.Any(e => e.CountryCode == id);
-        }
+        //private bool CountryExists(string id)
+        //{
+        //    return _context.Countries.Any(e => e.CountryCode == id);
+        //}
     }
 }
