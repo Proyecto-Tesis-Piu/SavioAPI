@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SavioAPI.Data;
 using SavioAPI.Models;
@@ -22,31 +24,48 @@ namespace SavioAPI.Controllers
         }
 
         // GET: api/Transactions
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetTransactions([FromBody] String Password,
-            [FromBody] DateTime FromDate, [FromBody] DateTime ToDate)
+        [HttpPost]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<CategoryDto>>> GetTransactions([FromBody] TransactionsRequest req)
         {
-            string userId = User.Claims.First(c => c.Type == "id").Value;
-            CategoryDto[] categories = _context.Categories2.FromSql();
-            ApplicationUser usertemp = await _context.Users.FindAsync(userId);
-            if(usertemp != null && usertemp.Password == Password)
+            string userId = String.Empty;
+            try
             {
-                if (FromDate == null && ToDate == null)
-                {
-                    return Ok(_context.Transactions.Where(t => t.UserId == userId));
+                userId = User.Claims.First(c => c.Type == "id").Value;
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null) {
+                    throw new Exception();
                 }
-                else
-                {
-
-                }
-
             }
-            else
-            {
-                var msg = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.Unauthorized) { ReasonPhrase = "ApplicationUser Not Found or Incorrect Password" };
-                throw new System.Web.Http.HttpResponseException(msg);
+            catch (Exception) {
+                return Unauthorized("Invalid username");
             }
 
+            SqlParameter param = new SqlParameter("@userId", userId);
+            SqlParameter param1 = new SqlParameter(), param2 = new SqlParameter();
+            param1.ParameterName = "@dateStart";
+            param2.ParameterName = "@dateEnd";
+            if (req.FromDate != null) { param1.Value = req.FromDate; } else { param1.Value = DBNull.Value; }
+            if (req.ToDate != null) { param2.Value = req.ToDate; } else { param2.Value = DBNull.Value; }
+            String query = "GET_CATEGORIES_TOTALS @userId, @dateStart, @dateEnd";
+
+            List<CategoryDto> categories =
+                _context.Categories2.FromSqlRaw(query, new object[] { param, param1, param2 })
+                .AsEnumerable()
+                .ToList();
+
+            query = "GET_TRANSACTIONS_FOR_USER @userId, @dateStart, @dateEnd";
+
+            List<Transaction> transactions =
+                _context.Transactions.FromSqlRaw(query, new object[] { param, param1, param2 })
+                .AsEnumerable()
+                .ToList();
+
+            foreach (CategoryDto category in categories) {
+                category.ChildrenTransactions = transactions.Where(t => t.Category == category.Id).ToArray();
+            }
+
+            return categories;
         }
 
         //// GET: api/Transactions/5
@@ -66,66 +85,85 @@ namespace SavioAPI.Controllers
         // PUT: api/Transactions/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTransaction(Guid id, Transaction transaction)
-        {
-            if (id != transaction.Id)
-            {
-                return BadRequest();
-            }
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> PutTransaction(Guid id, Transaction transaction)
+        //{
+        //    if (id != transaction.Id)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            _context.Entry(transaction).State = EntityState.Modified;
+        //    _context.Entry(transaction).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TransactionExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+        //    try
+        //    {
+        //        await _context.SaveChangesAsync();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!TransactionExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         // POST: api/Transactions
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
-        {
-            _context.Transactions.Add(transaction);
-            await _context.SaveChangesAsync();
+        //[HttpPost]
+        //public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
+        //{
+        //    _context.Transactions.Add(transaction);
+        //    await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTransaction", new { id = transaction.Id }, transaction);
-        }
+        //    return CreatedAtAction("GetTransaction", new { id = transaction.Id }, transaction);
+        //}
 
-        // DELETE: api/Transactions/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Transaction>> DeleteTransaction(Guid id)
+        // Post: api/Transactions/Delete
+        [HttpPost("Delete")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<CategoryDto>>> DeleteTransaction([FromBody] DeleteTransactionRequest body)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
+            Guid userId;
+            try
+            {
+                userId = new Guid(User.Claims.First(c => c.Type == "id").Value);
+                var user = await _context.Users.FindAsync(userId.ToString());
+                if (user == null)
+                {
+                    throw new Exception();
+                }
+            }
+            catch (Exception)
+            {
+                return Unauthorized("Invalid username");
+            }
+
+            var transaction = await _context.Transactions.FindAsync(body.TransactionID);
             if (transaction == null)
             {
                 return NotFound();
             }
 
-            _context.Transactions.Remove(transaction);
-            await _context.SaveChangesAsync();
-
-            return transaction;
+            if (transaction.UserId == userId)
+            {
+                _context.Transactions.Remove(transaction);
+                await _context.SaveChangesAsync();
+                return await GetTransactions(body);
+            }
+            return Unauthorized("User does not have permission to delete transaction.");
         }
 
-        private bool TransactionExists(Guid id)
-        {
-            return _context.Transactions.Any(e => e.Id == id);
-        }
+        //private bool TransactionExists(Guid id)
+        //{
+        //    return _context.Transactions.Any(e => e.Id == id);
+        //}
     }
 }

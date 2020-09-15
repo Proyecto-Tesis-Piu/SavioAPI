@@ -41,10 +41,10 @@ namespace SavioAPI.Controllers
 
         // POST: api/User/Login
         [HttpPost("Login")]
-        public async Task<ActionResult<ApplicationUser>> Login([FromBody]ApplicationUser user)
+        public async Task<ActionResult<ApplicationUser>> Login([FromBody] ApplicationUser user)
         {
-            var result = await _userManager.FindByNameAsync(user.Email);
-
+            ApplicationUser result = await _userManager.FindByNameAsync(user.Email);
+            
             if (result == null)
             {
                 return BadRequest(new { ReasonPhrase = "Email incorrecto" });

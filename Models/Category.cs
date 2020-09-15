@@ -25,13 +25,10 @@ namespace SavioAPI.Models
         [StringLength(50)]
         [Column("icon")]
         [Required]
-        public Byte icon { get; set; }
+        public String Icon { get; set; }
 
         [Column("User Id")]
         [Required]
         public Guid UserId { get; set; }
-
-        [NotMapped]
-        public Transaction[] ChildrenTransactions { get; set; }
     }
 }

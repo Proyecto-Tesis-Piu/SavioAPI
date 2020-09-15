@@ -17,7 +17,7 @@ namespace SavioAPI.Data
         {
             modelBuilder.Entity<Transaction>().ToTable("Transaction");
             modelBuilder.Entity<Category>().ToTable("Category");
-
+            modelBuilder.Entity<ApplicationUser>().ToTable("User");
         }
     }
 }
