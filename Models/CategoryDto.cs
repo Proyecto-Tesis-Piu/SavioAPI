@@ -36,6 +36,12 @@ namespace SavioAPI.Models
         [Column("Percentage")]
         public Decimal Percentage { get; set; }
 
+        [Column("Cumulative Percentage")]
+        public Decimal CumulativePercentage { get; set; }
+
+        [Column("Relative Percentage")]
+        public Decimal RelativePercentage { get; set; }
+
         [Column("Total")]
         public Decimal Amount { get; set; }
     }
