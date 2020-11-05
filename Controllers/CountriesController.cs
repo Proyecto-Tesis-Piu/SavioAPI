@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SavioAPI.Data;
-using SavioAPI.Models;
+using MonetaAPI.Data;
+using MonetaAPI.Models;
 
-namespace SavioAPI.Controllers
+namespace MonetaAPI.Controllers
 {
     [Route("api/Country")]
     [ApiController]

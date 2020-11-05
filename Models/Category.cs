@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SavioAPI.Models
+namespace MonetaAPI.Models
 {
     public class Category
     {
@@ -13,22 +13,19 @@ namespace SavioAPI.Models
         [Column("Id")]
         public Guid Id { get; set; }
 
-        [StringLength(2000)]
         [Column("Name")]
-        [Required]
-        public String Name { get; set; }
+        public String Concept { get; set; }
 
         [Column("Is Expense", TypeName = "bit")]
-        [Required]
         public bool IsExpense { get; set; }
 
-        [StringLength(50)]
         [Column("icon")]
-        [Required]
         public String Icon { get; set; }
 
         [Column("User Id")]
-        [Required]
-        public Guid UserId { get; set; }
+        public Nullable<Guid> UserId { get; set; }
+
+        [NotMapped]
+        public Decimal Amount { get; set; }
     }
 }

@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SavioAPI.Data;
+using MonetaAPI.Data;
 using Microsoft.AspNetCore.Builder;
+using Azure.Identity;
+using Microsoft.Extensions.Configuration;
 
-namespace SavioAPI
+namespace MonetaAPI
 {
     public class Program
     {
@@ -34,6 +36,20 @@ namespace SavioAPI
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+.ConfigureAppConfiguration((context, config) =>
+{
+var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+config.AddAzureKeyVault(
+keyVaultEndpoint,
+new DefaultAzureCredential());
+})
+.ConfigureAppConfiguration((context, config) =>
+{
+var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
+config.AddAzureKeyVault(
+keyVaultEndpoint,
+new DefaultAzureCredential());
+})
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

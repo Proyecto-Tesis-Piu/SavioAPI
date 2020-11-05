@@ -1,4 +1,4 @@
-﻿namespace SavioAPI.Models
+﻿namespace MonetaAPI.Models
 {
     public class ApplicationSettings
     {

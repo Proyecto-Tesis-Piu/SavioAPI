@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SavioAPI.Models;
+using MonetaAPI.Models;
 
-namespace SavioAPI.Controllers
+namespace MonetaAPI.Controllers
 {
     [Route("api/UserProfile")]
     [ApiController]

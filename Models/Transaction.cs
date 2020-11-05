@@ -2,13 +2,13 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SavioAPI.Models
+namespace MonetaAPI.Models
 {
     public class Transaction
     {
         [Key]
         [Column("Transaction Id")]
-        public Guid Id { get; set; }
+        public Nullable<Guid> Id { get; set; }
 
         [Required]
         [Column("User Id")]

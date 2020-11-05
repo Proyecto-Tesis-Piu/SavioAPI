@@ -17,7 +17,7 @@
       },
       "nativeDebugging": false
     },
-    "SavioAPI": {
+    "MonetaAPI": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/Country",

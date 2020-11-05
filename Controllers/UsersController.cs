@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using SavioAPI.Models;
-using SavioAPI.Data;
+using MonetaAPI.Models;
+using MonetaAPI.Data;
 using Newtonsoft.Json;
 using System.Text.Json;
 using System.Net;
@@ -18,7 +18,7 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Options;
 
-namespace SavioAPI.Controllers
+namespace MonetaAPI.Controllers
 {
     [Route("api/User")]
     [ApiController]
@@ -56,7 +56,8 @@ namespace SavioAPI.Controllers
                         Subject = new ClaimsIdentity(new Claim[] {
                             new Claim("id", result.Id.ToString())
                         }),
-                        Expires = DateTime.UtcNow.AddDays(1),
+                        Expires = DateTime.UtcNow.AddDays(30),
+                        //Issuer = JwtIdentityOptions.Issuer,
                         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256)
                     };
                     var tokenHandler = new JwtSecurityTokenHandler();

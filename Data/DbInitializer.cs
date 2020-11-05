@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using SavioAPI.Models;
+using MonetaAPI.Models;
 
-namespace SavioAPI.Data
+namespace MonetaAPI.Data
 {
     public static class DbInitializer
     {

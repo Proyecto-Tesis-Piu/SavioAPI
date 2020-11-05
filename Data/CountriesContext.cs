@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SavioAPI.Models;
+using MonetaAPI.Models;
 
-namespace SavioAPI.Data
+namespace MonetaAPI.Data
 {
     public class CountriesContext : DbContext
     {

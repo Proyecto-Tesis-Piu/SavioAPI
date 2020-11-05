@@ -5,8 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
-using SavioAPI.Data;
-using SavioAPI.Models;
+using MonetaAPI.Data;
+using MonetaAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Xml.Linq;
@@ -16,7 +16,7 @@ using System;
 using System.Diagnostics.Tracing;
 using System.Diagnostics;
 
-namespace SavioAPI
+namespace MonetaAPI
 {
     public class Startup
     {
@@ -49,9 +49,12 @@ namespace SavioAPI
 
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
 
-            services.AddDbContext<UserContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("SavioDatabase")));
-            services.AddDbContext<CountriesContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("SavioDatabase")));
-            services.AddDbContext<TransactionContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("SavioDatabase")));
+            services.AddDbContext<UserContext>(opt => { opt.UseSqlServer(Configuration.GetConnectionString("AzureDatabase")); });
+            services.AddDbContext<CountriesContext>(opt => { opt.UseSqlServer(Configuration.GetConnectionString("AzureDatabase")); });
+            services.AddDbContext<TransactionContext>(opt => { 
+                opt.UseSqlServer(Configuration.GetConnectionString("AzureDatabase"));
+                opt.EnableSensitiveDataLogging(true);
+            });
 
             services.AddDefaultIdentity<ApplicationUser>().AddEntityFrameworkStores<UserContext>();
 

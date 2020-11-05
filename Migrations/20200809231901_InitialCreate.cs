@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace SavioAPI.Migrations
+namespace MonetaAPI.Migrations
 {
     public partial class InitialCreate : Migration
     {

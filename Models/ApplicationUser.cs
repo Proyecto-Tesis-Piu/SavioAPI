@@ -4,7 +4,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SavioAPI.Models
+namespace MonetaAPI.Models
 {
     [Serializable]
     public class ApplicationUser : IdentityUser

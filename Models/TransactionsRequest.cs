@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SavioAPI.Models
+namespace MonetaAPI.Models
 {
     public class TransactionsRequest
     {
@@ -17,5 +17,16 @@ namespace SavioAPI.Models
 
     public class DeleteTransactionRequest : TransactionsRequest { 
         public Guid TransactionID { get; set; }
+    }
+
+    public class CreateTransactionRequest : TransactionsRequest
+    {
+        public Transaction Transaction { get; set; }
+    }
+
+    public class DeleteCategoryRequest 
+    {
+        public Guid deletedCategory { get; set; }
+        public Nullable<Guid> newCategory { get; set; }
     }
 }

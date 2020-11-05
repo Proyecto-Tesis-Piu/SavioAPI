@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SavioAPI.Data;
+using MonetaAPI.Data;
 
-namespace SavioAPI.Migrations
+namespace MonetaAPI.Migrations
 {
     [DbContext(typeof(UserContext))]
     [Migration("20200809231901_InitialCreate")]
@@ -21,7 +21,7 @@ namespace SavioAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("SavioAPI.Models.ApplicationUser", b =>
+            modelBuilder.Entity("MonetaAPI.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");

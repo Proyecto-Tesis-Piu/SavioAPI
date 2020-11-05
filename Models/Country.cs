@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SavioAPI.Models
+namespace MonetaAPI.Models
 {
     public class Country
     {

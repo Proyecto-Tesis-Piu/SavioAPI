@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SavioAPI.Models;
+using MonetaAPI.Models;
 
-namespace SavioAPI.Data
+namespace MonetaAPI.Data
 {
     public class TransactionContext : DbContext
     {
@@ -12,12 +12,15 @@ namespace SavioAPI.Data
         public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<CategoryDto> Categories2 { get; set; }
+        public DbSet<CalendarDates> CalendarDates { get; set; }
+        public DbSet<GeneralData> GeneralData { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Transaction>().ToTable("Transaction");
             modelBuilder.Entity<Category>().ToTable("Category");
             modelBuilder.Entity<ApplicationUser>().ToTable("User");
+            modelBuilder.Entity<GeneralData>().HasNoKey();
         }
     }
 }
