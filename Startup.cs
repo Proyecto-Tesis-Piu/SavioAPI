@@ -66,7 +66,7 @@ namespace MonetaAPI
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                     builder =>
                     {
-                        builder.WithOrigins(Configuration["ApplicationSettings:Client_URL"].ToString());
+                        builder.WithOrigins( new string[] { Configuration["ApplicationSettings:Local_URL"].ToString(), Configuration["ApplicationSettings:Client_URL"].ToString() });
                         builder.WithHeaders("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
                         builder.AllowAnyHeader();
                     });
