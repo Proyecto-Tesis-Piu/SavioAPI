@@ -23,7 +23,11 @@ namespace MonetaAPI.Models
         public String Icon { get; set; }
 
         [Column("User Id")]
-        public Nullable<Guid> UserId { get; set; }
+        public Guid UserId { get; set; }
+
+        [Column("Color")]
+        [StringLength(7)]
+        public String Color { get; set; }
 
         [NotMapped]
         public Decimal Amount { get; set; }

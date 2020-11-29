@@ -20,8 +20,7 @@ namespace MonetaAPI.Models
         public Country Country { get; set; }
 
         [NotMapped]
-        [ForeignKey("StateCode")]
-        public State State { get; set; }
+        public String StateName { get; set; }
 
         [Column("Sex", TypeName = "bit")]
         public bool SexBit { get; set; }

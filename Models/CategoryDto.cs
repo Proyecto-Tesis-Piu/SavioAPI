@@ -28,7 +28,10 @@ namespace MonetaAPI.Models
         public String Icon { get; set; }
 
         [Column("User Id")]
-        public Guid? UserId { get; set; }
+        public Guid UserId { get; set; }
+
+        [Column("Color")]
+        public String Color { get; set; }
 
         [NotMapped]
         public Transaction[] ChildrenTransactions { get; set; }
