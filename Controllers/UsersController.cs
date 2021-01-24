@@ -1,22 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using MonetaAPI.Models;
 using MonetaAPI.Data;
-using Newtonsoft.Json;
-using System.Text.Json;
-using System.Net;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MonetaAPI.Controllers
 {
@@ -26,8 +20,8 @@ namespace MonetaAPI.Controllers
     {
         private readonly UserContext _context;
 
-        private UserManager<ApplicationUser> _userManager;
-        private SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ApplicationSettings _appSettings;
 
         public UsersController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, UserContext context, 
@@ -50,24 +44,44 @@ namespace MonetaAPI.Controllers
                 return BadRequest(new { ReasonPhrase = "Email incorrecto" });
             }
             else {
-                if (await _userManager.CheckPasswordAsync(result, user.Password)) {
-                    var tokenDescriptor = new SecurityTokenDescriptor
+                if (!await _userManager.IsLockedOutAsync(result))
+                {
+                    if (await _userManager.CheckPasswordAsync(result, user.Password))
                     {
-                        Subject = new ClaimsIdentity(new Claim[] {
-                            new Claim("id", result.Id.ToString())
-                        }),
-                        Expires = DateTime.UtcNow.AddDays(30),
-                        //Issuer = JwtIdentityOptions.Issuer,
-                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256)
-                    };
-                    var tokenHandler = new JwtSecurityTokenHandler();
-                    var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-                    var token = tokenHandler.WriteToken(securityToken);
-                    return Ok(new { token });
+                        await _userManager.ResetAccessFailedCountAsync(result);
+                        var tokenDescriptor = new SecurityTokenDescriptor
+                        {
+                            Subject = new ClaimsIdentity(new Claim[] { new Claim("id", result.Id.ToString()) }),
+                            Expires = DateTime.UtcNow.AddDays(30),
+                            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256)
+                        };
+                        var tokenHandler = new JwtSecurityTokenHandler();
+                        var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+                        var token = tokenHandler.WriteToken(securityToken);
+
+                        LoginResponse response = new LoginResponse
+                        {
+                            Token = token,
+                            EmailConfirmed = result.EmailConfirmed
+                        };
+                        return Ok(response);
+                    }
+                    else
+                    {
+                        await _userManager.AccessFailedAsync(result);
+                        String message = String.Empty;
+                        if (await _userManager.IsLockedOutAsync(result))
+                        {
+                            message = " Cuenta bloqueada por 5 minutos.";
+                        }
+                        return Unauthorized(new { ReasonPhrase = "Password incorrecto." + message });
+                    }
+                }
+                else 
+                {
+                    return Unauthorized(await _userManager.GetLockoutEndDateAsync(result));
                 }
             }
-            return BadRequest(new { ReasonPhrase = "Password incorrecto" });
-
         }
 
         /* PUT: api/User/e91e94b8-d50f-4015-862a-1806c9fbe20c
@@ -163,17 +177,11 @@ namespace MonetaAPI.Controllers
             catch (Exception ex) {
                 throw ex;
             }
-
-
-            //_context.Users.Add(user);
-            //await _context.SaveChangesAsync();
-
-            //return CreatedAtAction("GetUser", new { id = user.Id }, user);
-
         }
 
         // POST: api/User/Feedback
         [HttpPost("Feedback")]
+        [Authorize]
         public async Task<ActionResult> Feedback([FromBody] Feedback feedback)
         {
             Guid userId;
@@ -198,15 +206,11 @@ namespace MonetaAPI.Controllers
             return Ok();
         }
 
-        //private bool UserExists(String id)
-        //{
-        //    return _context.Users.Any(e => e.Id == id);
-        //}
         // GET: api/User/ConfirmEmail
         [HttpGet("ConfirmEmail")]
+        [Authorize]
         public async Task<ActionResult> ConfirmEmail()
         {
-            //Guid userId;
             ApplicationUser user;
             String temp;
             String emailToken;
@@ -226,8 +230,6 @@ namespace MonetaAPI.Controllers
                 {
                     return NotFound("Usuario no encontrado");
                 }
-                //userId = new Guid();
-                //user = await _context.Users.FindAsync(userId.ToString());
                 
                 var result = await _userManager.ConfirmEmailAsync(user, emailToken);
                 if (result.Succeeded)
@@ -240,6 +242,47 @@ namespace MonetaAPI.Controllers
             {
                 throw ex;
             }
+        }
+
+        [HttpGet("ResendConfirmationEmail")]
+        [Authorize]
+        public async Task<ActionResult> ResendConfirmationEmail()
+        {
+            Guid userId;
+            try
+            {
+                userId = new Guid(User.Claims.First(c => c.Type == "id").Value);
+                var user = await _context.Users.FindAsync(userId.ToString());
+                if (user == null)
+                {
+                    throw new Exception();
+                }
+            }
+            catch (Exception)
+            {
+                return Unauthorized("Invalid username");
+            }
+
+            ApplicationUser userResult = await _userManager.FindByIdAsync(userId.ToString());
+            //prevent sending many email confirmations
+            if (!userResult.EmailConfirmed)
+            {
+                var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(userResult);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[] {
+                                new Claim("id", userResult.Id.ToString()),
+                                new Claim("emailToken", emailToken)
+                            }),
+                    Expires = DateTime.UtcNow.AddDays(30),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_appSettings.JWT_Secret)), SecurityAlgorithms.HmacSha256)
+                };
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+                var token = tokenHandler.WriteToken(securityToken);
+                MailSender.ConfirmMail(userResult.Email, token);
+            }
+            return Ok();
         }
     }
 }

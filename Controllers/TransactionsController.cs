@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -78,32 +77,32 @@ namespace MonetaAPI.Controllers
             return data;
         }
 
-        // PUT: api/Transactions/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutTransaction(Guid id, Transaction transaction)
-        //{
-        //    _context.Entry(transaction).State = EntityState.Modified;
+        /* PUT: api/Transactions/5
+         To protect from overposting attacks, enable the specific properties you want to bind to, for
+         more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutTransaction(Guid id, Transaction transaction)
+        {
+            _context.Entry(transaction).State = EntityState.Modified;
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!TransactionExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TransactionExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }*/
 
         // POST: api/Transactions/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -282,7 +281,7 @@ namespace MonetaAPI.Controllers
 
             List<Category> categories = 
                 await _context.Categories
-                .Where(cat => (cat.UserId == userId || cat.UserId == null))
+                .Where(cat => (cat.UserId == userId))
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -317,11 +316,15 @@ namespace MonetaAPI.Controllers
             }
 
             body.UserId = userId;
-
-            _context.Categories.Add(body);
-            await _context.SaveChangesAsync();
-
-            return await GetCategories();
+            //check if category name already exists for that user
+            bool categoryExists = CategoryExists(body.UserId, body.Concept);
+            if (!categoryExists)
+            {
+                _context.Categories.Add(body);
+                await _context.SaveChangesAsync();
+                return await GetCategories();
+            }
+            return Conflict("No puedes tener dos categorías con el mismo nombre");
         }
 
         // Post: api/Transactions/UpdateCategory
@@ -408,14 +411,15 @@ namespace MonetaAPI.Controllers
                 param2.ParameterName = "@newCategory";
                 if (body.newCategory != null) { param2.Value = body.newCategory; } else { param2.Value = DBNull.Value; }
                 String query = "DELETE_CATEGORY @userId, @deletedCategory, @newCategory";
-                var rowsAffected = _context.Database.ExecuteSqlRaw(query, new object[] { param, param1, param2 });
+                //var rowsAffected = 
+                _context.Database.ExecuteSqlRaw(query, new object[] { param, param1, param2 });
                 
                 return await GetCategories();
             }
             return Unauthorized("User does not have permission to delete category.");
         }
 
-        // Get: api/Transactions/Category/HasTransactions/{id}
+        // GET: api/Transactions/Category/HasTransactions/{id}
         [HttpGet("Category/HasTransactions/{id}")]
         [Authorize]
         public async Task<ActionResult<bool>> CategoryHasTransactions(string id)
@@ -435,7 +439,7 @@ namespace MonetaAPI.Controllers
                 return Unauthorized("Invalid username");
             }
 
-            Guid idTemp = new Guid();
+            Guid idTemp = Guid.NewGuid();
             bool result = Guid.TryParse(id, out idTemp);
 
             if (result)
@@ -451,6 +455,10 @@ namespace MonetaAPI.Controllers
             return _context.Categories
                 .AsNoTracking()
                 .FirstOrDefault(e => e.Id == id);
+        }
+
+        private bool CategoryExists(Guid userId, String name) {
+            return _context.Categories.Any(c => c.UserId == userId && c.Concept == name);
         }
         #endregion
 

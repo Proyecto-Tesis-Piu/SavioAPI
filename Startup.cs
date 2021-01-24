@@ -9,12 +9,9 @@ using MonetaAPI.Data;
 using MonetaAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Xml.Linq;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Diagnostics.Tracing;
-using System.Diagnostics;
 
 namespace MonetaAPI
 {
@@ -45,6 +42,8 @@ namespace MonetaAPI
                 opt.Password.RequireUppercase = false;
                 opt.Password.RequireLowercase = false;
                 opt.User.RequireUniqueEmail = true;
+                opt.Lockout.MaxFailedAccessAttempts = 3;
+                opt.Lockout.DefaultLockoutTimeSpan = new TimeSpan(0, 5, 0);
             });
 
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));

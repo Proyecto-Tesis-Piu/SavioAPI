@@ -9,4 +9,9 @@ namespace MonetaAPI.Models
     {
         public String Token { get; set; }
     }
+
+    public class LoginResponse : UserRequest 
+    { 
+        public Boolean EmailConfirmed { get; set; }
+    }
 }
