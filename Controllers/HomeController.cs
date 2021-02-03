@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace MonetaAPI.Controllers
 {
@@ -11,9 +12,9 @@ namespace MonetaAPI.Controllers
 
         // GET: api/external
         [HttpGet]
-        public ActionResult<string> WakeUp()
+        public ActionResult<String> WakeUp()
         {
-            return DateTime.Now.ToString();
+            return JsonSerializer.Serialize(DateTime.Now.ToString());
         }
     }
 }

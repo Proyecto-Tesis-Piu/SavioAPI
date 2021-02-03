@@ -38,10 +38,14 @@ namespace MonetaAPI
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((context, config) =>
                 {
-                    var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("VaultUri"));
-                    config.AddAzureKeyVault(
-                    keyVaultEndpoint,
-                    new DefaultAzureCredential());
+                    String vaultUri = Environment.GetEnvironmentVariable("VaultUri");
+                    if (vaultUri != null)
+                    {
+                        var keyVaultEndpoint = new Uri(vaultUri);
+                        config.AddAzureKeyVault(
+                        keyVaultEndpoint,
+                        new DefaultAzureCredential());
+                    }
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

@@ -50,10 +50,8 @@ namespace MonetaAPI
 
             services.AddDbContext<UserContext>(opt => { opt.UseSqlServer(Configuration.GetConnectionString("AzureDatabase")); });
             services.AddDbContext<CountriesContext>(opt => { opt.UseSqlServer(Configuration.GetConnectionString("AzureDatabase")); });
-            services.AddDbContext<TransactionContext>(opt => { 
-                opt.UseSqlServer(Configuration.GetConnectionString("AzureDatabase"));
-                opt.EnableSensitiveDataLogging(true);
-            });
+            services.AddDbContext<TransactionContext>(opt => { opt.UseSqlServer(Configuration.GetConnectionString("AzureDatabase")); });
+            services.AddDbContext<BlogContext>(opt => { opt.UseSqlServer(Configuration.GetConnectionString("AzureDatabase")); });
 
             services.AddDefaultIdentity<ApplicationUser>().AddEntityFrameworkStores<UserContext>();
 
@@ -90,6 +88,9 @@ namespace MonetaAPI
                     ValidateAudience = false,
                     ClockSkew = TimeSpan.Zero
                 };
+                //x.Authority = "https://monetastudio.us.auth0.com/api/v2/";
+                //x.Audience = "https://monetaapi.azurewebsites.net";
+                //x.Audience = "http://localhost:49755";
             });
         }
 
@@ -99,6 +100,10 @@ namespace MonetaAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home");
             }
 
             app.UseRouting();
