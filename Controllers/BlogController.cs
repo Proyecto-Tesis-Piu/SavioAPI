@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ namespace MonetaAPI.Controllers
             foreach (BlogArticle article in articles) {
                 article.Tags = article.TagsString.Split(',');
                 article.Bibliography = article.BibliographyString.Split('|');
+                article.Date = article.DateValue.ToString("d \\de MMMM \\de yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
             }
             return articles;
         }
@@ -52,7 +54,8 @@ namespace MonetaAPI.Controllers
 
             article.Tags = article.TagsString.Split(',');
             article.Bibliography = article.BibliographyString.Split('|');
-            
+            article.Date = article.DateValue.ToString("d \\de MMMM \\de yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
+
             return article;
         }
     }

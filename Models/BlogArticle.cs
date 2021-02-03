@@ -29,7 +29,7 @@ namespace MonetaAPI.Models
         [Column("Date")]
         [Required]
         [DisplayFormat(DataFormatString = "{0:O}", ApplyFormatInEditMode = true)]
-        public DateTime Date { get; set; }
+        public DateTime DateValue { get; set; }
 
         [Column("Author")]
         [Required]
@@ -43,6 +43,9 @@ namespace MonetaAPI.Models
 
         [NotMapped]
         public String[] Tags { get; set; }
+
+        [NotMapped]
+        public String Date { get; set; }
 
         [NotMapped]
         public String[] Bibliography { get; set; }
