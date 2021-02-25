@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -22,10 +23,10 @@ namespace MonetaAPI.Controllers
         // GET: api/blog
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BlogArticle>>> GetBlogArticles() {
-            List<BlogArticle> articles = await blogContext.Articles.ToListAsync();
+            List<BlogArticle> articles = await blogContext.Articles.OrderBy(item => item.DateValue).ToListAsync();
             foreach (BlogArticle article in articles) {
                 article.Tags = article.TagsString.Split(',');
-                article.Bibliography = article.BibliographyString.Split('|');
+                article.Bibliography = article.BibliographyString != null ? article.BibliographyString.Split('|') : null;
                 article.Date = article.DateValue.ToString("d \\de MMMM \\de yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
             }
             return articles;
@@ -53,7 +54,7 @@ namespace MonetaAPI.Controllers
             }
 
             article.Tags = article.TagsString.Split(',');
-            article.Bibliography = article.BibliographyString.Split('|');
+            article.Bibliography = article.BibliographyString != null ? article.BibliographyString.Split('|') : null;
             article.Date = article.DateValue.ToString("d \\de MMMM \\de yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
 
             return article;

@@ -13,18 +13,18 @@ namespace MonetaAPI.Models
 
         [Column("Title")]
         [Required]
-        public String Title { get; set; }
+        public string Title { get; set; }
 
         [Column("ShortText")]
-        public String ShortText { get; set; }
+        public string ShortText { get; set; }
         
         [Column("Text")]
         [Required]
-        public String Text { get; set; }
+        public string Text { get; set; }
 
         [Column("Image")]
         [Required]
-        public String Image { get; set; }
+        public string Image { get; set; }
 
         [Column("Date")]
         [Required]
@@ -33,21 +33,21 @@ namespace MonetaAPI.Models
 
         [Column("Author")]
         [Required]
-        public String Author { get; set; }
+        public string Author { get; set; }
 
         [Column("Tags")]
-        public String TagsString { get; set; }
+        public string TagsString { get; set; }
 
         [Column("Bibliography")]
-        public String BibliographyString { get; set; }
+        public string BibliographyString { get; set; }
 
         [NotMapped]
-        public String[] Tags { get; set; }
+        public string[] Tags { get; set; }
 
         [NotMapped]
-        public String Date { get; set; }
+        public string Date { get; set; }
 
         [NotMapped]
-        public String[] Bibliography { get; set; }
+        public string[] Bibliography { get; set; }
     }
 }
