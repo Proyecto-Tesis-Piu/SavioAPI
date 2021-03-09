@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -48,6 +49,15 @@ namespace MonetaAPI.Models
         public string Date { get; set; }
 
         [NotMapped]
-        public string[] Bibliography { get; set; }
+        public List<Bibliography> Bibliography { get; set; }
+
+        [Column("Image Caption")]
+        public string Caption { get; set; }
+    }
+
+    public class Bibliography {
+        public string Text { get; set; }
+
+        public string Url { get; set; }
     }
 }

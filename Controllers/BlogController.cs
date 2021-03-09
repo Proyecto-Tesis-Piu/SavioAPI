@@ -23,13 +23,23 @@ namespace MonetaAPI.Controllers
         // GET: api/blog
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BlogArticle>>> GetBlogArticles() {
-            List<BlogArticle> articles = await blogContext.Articles.OrderBy(item => item.DateValue).ToListAsync();
+            List<BlogArticle> articles = await blogContext.Articles
+                .OrderBy(item => item.DateValue)
+                .ToListAsync();
             foreach (BlogArticle article in articles) {
                 article.Tags = article.TagsString.Split(',');
-                article.Bibliography = article.BibliographyString != null ? article.BibliographyString.Split('|') : null;
                 article.Date = article.DateValue.ToString("d \\de MMMM \\de yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
             }
-            return articles;
+            List<BlogArticle> result = articles
+                .Select(item => new BlogArticle() {
+                    Date = item.Date,
+                    Id = item.Id,
+                    Title = item.Title,
+                    Image = item.Image,
+                    ShortText = item.ShortText,
+                    Tags = item.Tags
+                }).ToList();
+            return result;
         }
 
         // GET: api/blog/5
@@ -54,7 +64,19 @@ namespace MonetaAPI.Controllers
             }
 
             article.Tags = article.TagsString.Split(',');
-            article.Bibliography = article.BibliographyString != null ? article.BibliographyString.Split('|') : null;
+            if (article.BibliographyString != null) {
+                article.Bibliography = new List<Bibliography>();
+                foreach (String bibTemp in article.BibliographyString.Split('|')) {
+                    String[] result = bibTemp.Split('^');
+                    Bibliography bibliography = new Bibliography();
+                    bibliography.Text = result[0];
+                    if (result.Length > 1)
+                    {
+                        bibliography.Url = result[1];
+                    }
+                    article.Bibliography.Add(bibliography);
+                }
+            }
             article.Date = article.DateValue.ToString("d \\de MMMM \\de yyyy", CultureInfo.CreateSpecificCulture("es-MX"));
 
             return article;
